@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Principal</title>
+</head>
+<body>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="20">
+    <tr>
+        <td colspan="2" align="center">
+            <h1 th:text="'Bienvenido, ' + ${usuarioActual} + ' (' + ${rolUsuario} + ')'">Bienvenido!</h1>
+            <hr size="2" color="#000000">
+        </td>
+    </tr>
+    <tr valign="top">
+        <!-- Columna izquierda: Gestión de Personas -->
+        <td width="50%" align="center">
+            <table border="1" cellpadding="15" cellspacing="0" width="80%">
+                <tr bgcolor="#e6e6e6">
+                    <th colspan="2">Gestión de Personas</th>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <button onclick="window.location.href='/personas/form'"
+                                style="width:200px;height:40px;background-color:#4CAF50;color:white;border:none;cursor:pointer;">
+                            Registrar Persona
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <button onclick="window.location.href='/personas/listado'"
+                                style="width:200px;height:40px;background-color:#2196F3;color:white;border:none;cursor:pointer;">
+                            Ver Listado de Personas
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </td>
+
+        <!-- Columna derecha: Gestión de Compras -->
+        <td width="50%" align="center">
+            <table border="1" cellpadding="15" cellspacing="0" width="80%">
+                <tr bgcolor="#e6e6e6">
+                    <th colspan="2">Gestión de Compras</th>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <button onclick="window.location.href='/compras/ordenes/vista'"
+                                style="width:200px;height:40px;background-color:#FF9800;color:white;border:none;cursor:pointer;">
+                            Ver Órdenes de Compra
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <button onclick="window.location.href='/compras/productos/vista'"
+                                style="width:200px;height:40px;background-color:#9C27B0;color:white;border:none;cursor:pointer;">
+                            Ver Productos
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <button onclick="window.location.href='/compras/proveedores/vista'"
+                                style="width:200px;height:40px;background-color:#607D8B;color:white;border:none;cursor:pointer;">
+                            Ver Proveedores
+                        </button>
+                    </td>
+                </tr>
+                <!-- NUEVOS BOTONES -->
+                <tr>
+                    <td align="center">
+                        <button onclick="window.location.href='/compras/ordenes/reporte'"
+                                style="width:200px;height:40px;background-color:#3F51B5;color:white;border:none;cursor:pointer;">
+                            Reporte Órdenes
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" th:each="orden : ${ordenes}">
+                        <button th:onclick="'window.location.href=\'/compras/ordenes/' + ${orden.id} + '/movimientos\''"
+                                style="width:200px;height:40px;background-color:#795548;color:white;border:none;cursor:pointer;">
+                            Movimientos de Stock de Orden <span th:text="${orden.id}"></span>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="2" align="center">
+            <br><br>
+            <hr size="1" color="#cccccc">
+            <!-- Sección inferior: Configuración y sesión -->
+            <table cellpadding="10">
+                <tr>
+                    <td>
+                        <button onclick="window.location.href='/usuario/cambiar-contrasena'"
+                                style="width:180px;height:35px;background-color:#009688;color:white;border:none;cursor:pointer;">
+                            Cambiar Contraseña
+                        </button>
+                    </td>
+                    <td>
+                        <form th:action="@{/logout}" method="post" style="display:inline;">
+                            <button type="submit"
+                                    style="width:180px;height:35px;background-color:#f44336;color:white;border:none;cursor:pointer;">
+                                Cerrar Sesión
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

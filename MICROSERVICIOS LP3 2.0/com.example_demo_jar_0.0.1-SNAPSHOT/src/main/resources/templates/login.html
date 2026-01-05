@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Sistema de Usuarios</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        .login-container { max-width: 400px; margin: auto; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+        label { display: block; margin-top: 10px; }
+        input[type=text], input[type=password] { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        .error { color: red; font-size: 0.9em; }
+        button { margin-top: 15px; padding: 10px 20px; width: 100%; }
+        .guest-button { background-color: #f0f0f0; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Iniciar Sesión</h2>
+
+    <form th:action="@{/login}" method="post">
+        <label>Usuario:</label>
+        <input type="text" name="username" required>
+        <div th:if="${param.error}" class="error">Usuario o contraseña incorrecta</div>
+
+        <label>Contraseña:</label>
+        <input type="password" name="password" required>
+
+        <label>
+            <input type="checkbox" name="remember-me"> Recordarme
+        </label>
+
+        <button type="submit">Ingresar</button>
+    </form>
+
+    <form th:action="@{/invitado}" method="get">
+        <button type="submit" class="guest-button">Ingresar como Invitado</button>
+    </form>
+
+</div>
+
+</body>
+</html>

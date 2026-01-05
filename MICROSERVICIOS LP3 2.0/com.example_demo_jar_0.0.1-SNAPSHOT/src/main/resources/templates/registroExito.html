@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuario Registrado</title>
+</head>
+<body>
+
+<h2>Usuario registrado correctamente</h2>
+
+<p>Usuario: <strong th:text="${usuario.usuario}"></strong></p>
+<p>Persona asociada: 
+    <strong th:text="${persona.nombres + ' ' + persona.apellidos}"></strong>
+</p>
+<p>ID Persona: <strong th:text="${persona.idPersona}"></strong></p>
+
+<button onclick="location.href='/login'">Ir al login</button>
+<button onclick="location.href='/registro'">Registrar otro usuario</button>
+
+</body>
+</html>
