@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Notas de Remisión</title></head>
+<body>
+<h2>Listado de Notas de Remisión</h2>
+<table>
+    <tr>
+        <th>ID</th><th>Proveedor</th><th>Fecha</th><th>Número</th><th>Vendedor</th>
+    </tr>
+    <tr th:each="remision : ${remisiones}">
+        <td th:text="${remision.id}"></td>
+        <td th:text="${remision.proveedor.razonSocial}"></td>
+        <td th:text="${remision.fecha}"></td>
+        <td th:text="${remision.numero}"></td>
+        <td th:text="${remision.vendedor.codigoVendedor}"></td>
+    </tr>
+</table>
+</body>
+</html>

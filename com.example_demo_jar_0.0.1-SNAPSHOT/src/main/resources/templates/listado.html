@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Personas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; background: #f4f7f9; }
+        h2 { color: #1a73e8; margin-bottom: 20px; }
+        .filtro { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+        .filtro input, .filtro select { padding: 8px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc; }
+        .filtro button { padding: 8px 16px; font-size: 14px; border: none; border-radius: 6px; background: #1a73e8; color: #fff; cursor: pointer; }
+        .filtro button:hover { background: #1557b0; }
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        th, td { padding: 10px; text-align: left; font-size: 13px; border-bottom: 1px solid #eee; }
+        th { background: #1a73e8; color: #fff; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        a.btn-edit { padding: 6px 10px; border-radius: 4px; font-size: 12px; color: #fff; text-decoration: none; background: #4CAF50; }
+        a.btn-edit:hover { background: #388E3C; }
+        td.roles span { display: inline-block; background: #e8f0fe; color: #1a73e8; padding: 2px 6px; border-radius: 4px; margin-right: 4px; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+<h2>Listado de Personas</h2>
+
+<!-- FILTROS - envía a /personas/listado (tu controlador) -->
+<form class="filtro" th:action="@{/personas/listado}" method="get">
+    <input type="text" name="q" placeholder="Nombre, apellido, razón social, cédula o RUC" th:value="${q}"/>
+
+    <select name="rol">
+        <option value="">-- Rol --</option>
+        <option value="CLI" th:selected="${rol == 'CLI'}">Cliente</option>
+        <option value="PROV" th:selected="${rol == 'PROV'}">Proveedor</option>
+        <option value="VEND" th:selected="${rol == 'VEND'}">Vendedor</option>
+        <option value="COMP" th:selected="${rol == 'COMP'}">Comprador</option>
+        <option value="USER" th:selected="${rol == 'USER'}">Con Usuario</option>
+    </select>
+
+    <select id="filtroCiudad" name="ciudadId" th:attr="data-selected=${ciudadId}">
+        <option value="">-- Ciudad --</option>
+        <!-- si tu controlador ya pasa 'ciudades', Thymeleaf las imprimirá; si no, JS las carga -->
+        <option th:each="c : ${ciudades}" th:value="${c.id}" th:text="${c.nombre}" th:selected="${ciudadId != null and ciudadId == c.id}"></option>
+    </select>
+
+    <select name="estadoCivil">
+        <option value="">-- Estado Civil --</option>
+        <option value="SOLTERO/A" th:selected="${estadoCivil == 'SOLTERO/A'}">Soltero/a</option>
+        <option value="CASADO/A" th:selected="${estadoCivil == 'CASADO/A'}">Casado/a</option>
+        <option value="DIVORCIADO/A" th:selected="${estadoCivil == 'DIVORCIADO/A'}">Divorciado/a</option>
+        <option value="VIUDO/A" th:selected="${estadoCivil == 'VIUDO/A'}">Viudo/a</option>
+    </select>
+
+    <button type="submit"><i class="fa fa-search"></i> Filtrar</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tipo</th>
+            <th>Nombre / Razón Social</th>
+            <th>Documento</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
+            <th>Ciudad</th>
+            <th>Fecha Nacimiento</th>
+            <th>Fecha Ingreso</th>
+            <th>Roles</th>
+            <th>Usuario creador</th>
+            <th>Usuario Vinculado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="p : ${personas}">
+            <td th:text="${p.idPersona}"></td>
+            <td th:text="${p.tipoPersona}"></td>
+            <td th:text="${p.nombreMostrable}"></td>
+            <td th:text="${p.documentoMostrable}"></td>
+            <td th:text="${p.email != null ? p.email : '-'}"></td>
+            <td th:text="${p.telefono != null ? p.telefono : '-'}"></td>
+            <td th:text="${p.direccion != null ? p.direccion : '-'}"></td>
+            <td th:text="${p.ciudad != null ? p.ciudad.nombre : '-'}"></td>
+
+            <!-- Formateo correcto: no usar ${} dentro de la expresión -->
+            <td th:text="${p.fechaNacimiento != null ? #temporals.format(p.fechaNacimiento, 'dd/MM/yyyy') : '-'}"></td>
+            <td th:text="${p.fechaIngreso != null ? #temporals.format(p.fechaIngreso, 'yyyy-MM-dd') : '-'}"></td>
+
+            <td class="roles">
+                <span th:if="${p.esCliente}">Cliente</span>
+                <span th:if="${p.esProveedor}">Proveedor</span>
+                <span th:if="${p.esVendedor}">Vendedor</span>
+                <span th:if="${p.esComprador}">Comprador</span>
+            </td>
+
+            <td th:text="${p.usuario != null ? p.usuario.usuario : '-'}"></td>
+            <td th:text="${p.usuarioVinculado != null ? p.usuarioVinculado.usuario : '-'}"></td>
+
+            <td>
+                <a th:href="@{'/personas/editar/' + ${p.idPersona}}" class="btn-edit">
+                    <i class="fa fa-edit"></i> Editar
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+/*
+  Asegura que el filtro de ciudades se cargue con las ciudades de Paraguay
+  si el backend no las pasó en el model. Ajusta PARAGUAY_ID si hace falta.
+*/
+document.addEventListener('DOMContentLoaded', () => {
+    const filtroCiudad = document.getElementById('filtroCiudad');
+    const PARAGUAY_ID = 171; // cambia si tu DB usa otro ID
+
+    // si el backend ya pasó opciones (thymeleaf), no sobreescribimos.
+    // Solo cargamos por AJAX si el select tiene solo la opción por defecto.
+    if (filtroCiudad && filtroCiudad.options.length <= 1) {
+        const selected = filtroCiudad.getAttribute('data-selected');
+        fetch(`/api/ciudades/por-pais/${PARAGUAY_ID}`)
+            .then(resp => resp.ok ? resp.json() : Promise.reject('no ok'))
+            .then(ciudades => {
+                filtroCiudad.innerHTML = '<option value="">-- Ciudad --</option>';
+                ciudades.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.nombre;
+                    if (selected && String(c.id) === String(selected)) opt.selected = true;
+                    filtroCiudad.appendChild(opt);
+                });
+            }).catch(err => console.warn('No se pudieron cargar ciudades por AJAX:', err));
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Compras</title>
+    <style>/* igual estilo */</style>
+</head>
+<body>
+<h2>Listado de Compras</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Orden</th>
+        <th>Fecha</th>
+        <th>Subtotal</th>
+        <th>IVA</th>
+        <th>Total</th>
+    </tr>
+    <tr th:each="compra : ${compras}">
+        <td th:text="${compra.id}"></td>
+        <td th:text="${compra.ordenCompra.id}"></td>
+        <td th:text="${compra.fecha}"></td>
+        <td th:text="${compra.subtotal}"></td>
+        <td th:text="${compra.iva}"></td>
+        <td th:text="${compra.total}"></td>
+    </tr>
+</table>
+</body>
+</html>

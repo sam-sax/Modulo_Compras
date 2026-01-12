@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Notas de Crédito</title></head>
+<body>
+<h2>Listado de Notas de Crédito</h2>
+<table>
+    <tr>
+        <th>ID</th><th>Proveedor</th><th>Fecha</th><th>Monto sin IVA</th><th>IVA</th><th>Total</th>
+    </tr>
+    <tr th:each="nota : ${notasCredito}">
+        <td th:text="${nota.id}"></td>
+        <td th:text="${nota.proveedor.razonSocial}"></td>
+        <td th:text="${nota.fecha}"></td>
+        <td th:text="${nota.montoSinIva}"></td>
+        <td th:text="${nota.iva}"></td>
+        <td th:text="${nota.montoTotal}"></td>
+    </tr>
+</table>
+</body>
+</html>

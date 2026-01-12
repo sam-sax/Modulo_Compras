@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuario Registrado</title>
+    <style>
+        .container { text-align: center; margin-top: 50px; font-family: sans-serif; }
+        .card { border: 1px solid #ddd; padding: 20px; display: inline-block; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn { padding: 10px 20px; cursor: pointer; border: none; border-radius: 4px; margin: 5px; text-decoration: none; display: inline-block; }
+        .btn-login { background-color: #28a745; color: white; }
+        .btn-reg { background-color: #007bff; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2>🎉 ¡Registro Completado!</h2>
+        <p th:text="${mensaje}"></p>
+        <p>El usuario ya puede acceder al sistema con sus credenciales.</p>
+        <hr>
+        <a th:href="@{/login}" class="btn btn-login">Ir al login</a>
+        <a th:href="@{/admin/registro}" class="btn btn-reg">Registrar otro</a>
+        <br>
+        <a th:href="@{/admin/principal}">Volver al Panel Admin</a>
+    </div>
+</div>
+
+</body>
+</html>
