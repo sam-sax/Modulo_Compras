@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva Nota de Débito</title>
+    <style>
+        /* Requisito: Flush with the top */
+        body, html { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; }
+        .header-nd { background: #2c3e50; color: white; padding: 20px; text-align: center; border-bottom: 4px solid #1a252f; }
+        .container { padding: 20px; max-width: 900px; margin: 0 auto; }
+        .card { background: white; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .col { flex: 1; display: flex; flex-direction: column; }
+        label { font-weight: bold; font-size: 0.85rem; margin-bottom: 5px; color: #34495e; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; outline: none; }
+        .btn-add { background: #3498db; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; margin-bottom: 15px; font-weight: bold; }
+        .btn-save { background: #27ae60; color: white; padding: 15px; border: none; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s; }
+        .btn-save:hover { background: #219150; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 10px; background: #f8f9fa; border-bottom: 2px solid #dee2e6; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+    
+    <div class="header-nd">
+        <h2 style="margin:0;">Registrar Nota de Débito de Proveedor</h2>
+    </div>
+
+    <div class="container">
+        <form th:action="@{/compras/notas-debito/guardar}" th:object="${notaDebitoDTO}" method="post">
+            <div class="card">
+                <div class="row">
+                    <div class="col">
+                        <label>Proveedor</label>
+                        <select th:field="*{proveedorId}" required>
+                            <option value="">Seleccione un proveedor...</option>
+                            <option th:each="p : ${proveedores}" th:value="${p.id}" th:text="${p.razonSocial}"></option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label>Fecha del Documento</label>
+                        <input type="date" th:field="*{fecha}" required />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="margin:0; font-size: 1.1rem; color: #2c3e50;">Mercadería Adicional / Cargos</h3>
+                    <button type="button" class="btn-add" onclick="agregarFila()">+ Agregar Ítem</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="65%">Producto / Concepto</th>
+                            <th width="25%">Cantidad</th>
+                            <th width="10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoDetalles">
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="row">
+                    <div class="col"><label>Subtotal (Exento/Gravado)</label><input type="number" th:field="*{montoSinIva}" step="0.01" placeholder="0" required></div>
+                    <div class="col"><label>IVA (Liquidado)</label><input type="number" th:field="*{iva}" step="0.01" placeholder="0" required></div>
+                    <div class="col"><label>Total a Pagar</label><input type="number" th:field="*{montoTotal}" step="0.01" placeholder="0" style="font-weight: bold; background: #f9f9f9;" required></div>
+                </div>
+                <button type="submit" class="btn-save">CONFIRMAR REGISTRO Y ACTUALIZAR STOCK</button>
+            </div>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        let contador = 0;
+        const productos = [[${productos}]];
+
+        function agregarFila() {
+            const tbody = document.getElementById('cuerpoDetalles');
+            const fila = document.createElement('tr');
+            let opciones = productos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+            
+            fila.innerHTML = `
+                <td><select name="detalles[${contador}].productoId" style="width:100%">${opciones}</select></td>
+                <td><input type="number" name="detalles[${contador}].cantidad" value="1" min="1" style="width:100%"></td>
+                <td style="text-align:center"><button type="button" onclick="this.parentElement.parentElement.remove()" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold; font-size:1.2rem;">✕</button></td>
+            `;
+            tbody.appendChild(fila);
+            contador++;
+        }
+        window.onload = agregarFila;
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Comprador</title>
+    <style>
+        /* Flush with the top of the page */
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background-color: #f4f7f6; 
+            margin: 0; 
+            padding: 0; 
+        }
+        .form-container { 
+            max-width: 500px; 
+            margin: 20px auto; /* Reducido el margen superior */
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        h1 { color: #d35400; text-align: center; margin-top: 0; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; color: #333; }
+        input, select, button { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;}
+        button { background-color: #d35400; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #a04000; }
+        .error-msg { color: white; background: #e74c3c; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="form-container">
+        <h1>Registrar Comprador</h1>
+        
+        <div th:if="${error}" class="error-msg" th:text="${error}"></div>
+
+        <form th:action="@{/admin/comprador/guardar}" method="post">
+            <label>Nuevo Usuario (Login):</label>
+            <input type="text" name="usuario" placeholder="Ej: comprador_01" required/>
+
+            <label>Contraseña:</label>
+            <input type="password" name="clave" placeholder="••••••••" required/>
+
+            <label>Empleado (Persona):</label>
+            <select name="personaId" required>
+                <option value="">-- Seleccionar Empleado --</option>
+                <option th:each="p : ${personas}"
+                        th:value="${p.idPersona}" 
+                        th:text="${p.nombres + ' ' + p.apellidos}">
+                </option>
+            </select>
+
+            <button type="submit">💾 Guardar Comprador</button>
+        </form>
+        <div style="text-align: center;">
+            <a th:href="@{/admin/principal}" style="color: #666; text-decoration: none;">← Cancelar y volver</a>
+        </div>
+    </div>
+</body>
+</html>

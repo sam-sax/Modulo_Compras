@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajustes de Inventario</title>
+    <style>
+        /* Mantenemos el requisito: Flush with the top + espacio para el menú fixed */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            padding-top: 70px; /* Evita que el fragmento tape el header */
+            font-family: 'Segoe UI', sans-serif; 
+            background: #f4f7f6; 
+        }
+        .header { background: #34495e; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .container { padding: 20px; max-width: 1100px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-new { background: #1abc9c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .tipo-entrada { color: #27ae60; font-weight: bold; }
+        .tipo-salida { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header">
+        <h2 style="margin:0;">Historial de Ajustes de Stock</h2>
+        <a th:href="@{/compras/ajustes/nuevo}" class="btn-new">+ Realizar Ajuste Manual</a>
+    </div>
+    <div class="container">
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha/Hora</th>
+                        <th>Producto</th>
+                        <th>Tipo</th>
+                        <th>Cantidad</th>
+                        <th>Motivo/Observación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="a : ${ajustes}">
+                        <td th:text="${#temporals.format(a.fecha, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${a.producto.nombre}" style="font-weight: bold;"></td>
+                        <td>
+                            <span th:class="${a.tipo == 'ENTRADA' ? 'tipo-entrada' : 'tipo-salida'}" th:text="${a.tipo}"></span>
+                        </td>
+                        <td th:text="${a.cantidad}"></td>
+                        <td th:text="${a.motivo}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

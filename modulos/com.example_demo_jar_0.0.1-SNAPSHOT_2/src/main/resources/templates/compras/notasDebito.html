@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Notas de Débito - Sistema Compras</title>
+    <style>
+        body, html { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; }
+        .header-list { background: #2c3e50; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #1a252f; }
+        .header-list h2 { margin: 0; }
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        
+        .filter-bar { display: flex; gap: 15px; align-items: center; }
+        .btn-new { background: #ecf0f1; color: #2c3e50; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; transition: 0.3s; }
+        .btn-new:hover { background: #bdc3c7; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #f8f9fa; color: #2c3e50; padding: 12px; text-align: left; border-bottom: 2px solid #bdc3c7; font-size: 0.9rem; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .monto { font-weight: bold; color: #2980b9; text-align: right; font-family: 'Consolas', monospace; }
+        .btn-search { background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header-list">
+        <h2>Notas de Débito Recibidas</h2>
+        <a th:href="@{/compras/notas-debito/nuevo}" class="btn-new">+ Cargar Nota de Débito</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <form th:action="@{/compras/notas-debito/vista}" method="get" class="filter-bar">
+                <label style="font-weight: bold;">Filtrar Proveedor:</label>
+                <select name="proveedorId" style="padding: 8px; border-radius: 4px; min-width: 250px;">
+                    <option value="">-- Todos los proveedores --</option>
+                    <option th:each="p : ${proveedores}" th:value="${p.id}" th:text="${p.razonSocial}" th:selected="${p.id == param.proveedorId}"></option>
+                </select>
+                <button type="submit" class="btn-search">Filtrar</button>
+                <a th:href="@{/compras/notas-debito/vista}" style="font-size: 0.8rem; color: #7f8c8d;">Limpiar</a>
+            </form>
+        </div>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha Emisión</th>
+                        <th>Proveedor</th>
+                        <th style="text-align: right">Subtotal</th>
+                        <th style="text-align: right">IVA</th>
+                        <th style="text-align: right">Total Cargo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="n : ${notasDebito}">
+                        <td th:text="${#temporals.format(n.fecha, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${n.proveedor.razonSocial}" style="font-weight: 500;"></td>
+                        <td class="monto" style="color: #7f8c8d;" th:text="${#numbers.formatDecimal(n.montoSinIva, 1, 'POINT', 0, 'COMMA')}"></td>
+                        <td class="monto" style="color: #e67e22;" th:text="${#numbers.formatDecimal(n.iva, 1, 'POINT', 0, 'COMMA')}"></td>
+                        <td class="monto" th:text="${#numbers.formatDecimal(n.montoTotal, 1, 'POINT', 0, 'COMMA')}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(notasDebito)}">
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #95a5a6;">No se encontraron registros.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

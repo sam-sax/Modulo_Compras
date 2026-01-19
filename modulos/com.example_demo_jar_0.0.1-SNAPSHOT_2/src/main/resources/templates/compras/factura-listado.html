@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Libro Compras</title>
+    <style>
+        /* Requisito: Flush with the top */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            padding-top: 60px; /* Ajuste para que no tape el contenido el menú fixed */
+            font-family: 'Segoe UI', sans-serif; 
+        }
+        .container { padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #2c3e50; color: white; padding: 12px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; }
+        .monto { text-align: right; font-family: monospace; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+        .contado { background: #d4edda; color: #155724; }
+        .credito { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="container">
+        <h2>Libro de Facturas de Compra</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Nro Factura</th>
+                    <th>Proveedor</th>
+                    <th>Condición</th>
+                    <th class="monto">Exenta</th>
+                    <th class="monto">IVA 5%</th>
+                    <th class="monto">IVA 10%</th>
+                    <th class="monto">Total Final</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="f : ${facturas}">
+                    <td th:text="${f.fechaEmision}"></td>
+                    <td th:text="${f.numeroFactura}"></td>
+                    <td th:text="${f.proveedor.razonSocial}"></td>
+                    <td>
+                        <span th:class="${f.condicion.name() == 'CONTADO'} ? 'badge contado' : 'badge credito'" 
+                              th:text="${f.condicion}"></span>
+                    </td>
+                    <td class="monto" th:text="${#numbers.formatDecimal(f.totalExenta, 0, 'POINT', 0, 'COMMA')}"></td>
+                    <td class="monto" th:text="${#numbers.formatDecimal(f.totalIva5, 0, 'POINT', 0, 'COMMA')}"></td>
+                    <td class="monto" th:text="${#numbers.formatDecimal(f.totalIva10, 0, 'POINT', 0, 'COMMA')}"></td>
+                    <td class="monto" style="font-weight: bold;" 
+                        th:text="${#numbers.formatDecimal(f.totalFinal, 0, 'POINT', 0, 'COMMA')}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

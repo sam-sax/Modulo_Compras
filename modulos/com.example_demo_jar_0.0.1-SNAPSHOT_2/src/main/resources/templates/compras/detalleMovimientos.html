@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Movimientos de Stock</title>
+    <style>
+        body, html { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; }
+        .header { background: #16a085; color: white; padding: 20px; text-align: center; }
+        .container { padding: 25px; max-width: 900px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #dee2e6; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .btn-back { display: inline-block; margin-top: 20px; color: #2980b9; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+    <div class="header">
+        <h2 style="margin:0;">Movimientos de Stock - Orden #<span th:text="${ordenId}"></span></h2>
+    </div>
+    <div class="container">
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Tipo</th>
+                        <th>Cantidad</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="m : ${movimientos}">
+                        <td th:text="${m.productoNombre}"></td>
+                        <td th:text="${m.tipoMovimiento}"></td>
+                        <td th:text="${m.cantidad}" style="font-weight:bold; color:#27ae60;"></td>
+                        <td th:text="${#temporals.format(m.fecha, 'dd/MM/yyyy HH:mm')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <a th:href="@{/compras/ordenes/vista}" class="btn-back">← Volver al Panel de Órdenes</a>
+        </div>
+    </div>
+</body>
+</html>

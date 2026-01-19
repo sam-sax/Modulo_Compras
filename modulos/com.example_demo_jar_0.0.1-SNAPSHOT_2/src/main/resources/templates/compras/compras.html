@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Compras - Listado</title>
+    <style>
+        /* Requisito: Flush with the top + espacio para el menú fixed */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            padding-top: 70px; /* Ajuste para el menú global */
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #f4f7f6; 
+        }
+
+        /* Reemplazamos el navbar viejo por un header de contenido */
+        .page-header { 
+            background: #2c3e50; 
+            color: white; 
+            padding: 1.5rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .page-header h2 { margin: 0; font-size: 1.5rem; }
+
+        .btn-add { 
+            background: #27ae60; 
+            color: white; 
+            padding: 10px 15px; 
+            text-decoration: none; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            transition: background 0.3s;
+        }
+        .btn-add:hover { background: #219150; }
+
+        .content { padding: 20px; }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: white; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { 
+            background: #ecf0f1; 
+            color: #2c3e50; 
+            text-transform: uppercase; 
+            font-size: 0.85rem; 
+            letter-spacing: 0.5px;
+        }
+        tr:hover { background: #f9f9f9; }
+
+        .badge { padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        
+        .btn-view {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .btn-view:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="page-header">
+        <h2>Gestión de Facturas de Compra</h2>
+        <a th:href="@{/compras/compras/nuevo}" class="btn-add">+ Registrar Nueva Compra</a>
+    </div>
+
+    <div class="content">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Factura Nro.</th>
+                    <th>Proveedor (RUC)</th>
+                    <th>Subtotal</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="c : ${compras}">
+                    <td th:text="${c.fecha}"></td>
+                    <td th:text="${c.numeroFactura}"></td>
+                    <td th:text="${c.proveedor.razonSocial + ' (' + c.proveedor.ruc + ')'}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.subtotal, 1, 'POINT', 0, 'COMMA')}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.total, 1, 'POINT', 0, 'COMMA')}"></td>
+                    <td>
+                        <span th:class="${c.estado.name() == 'APROBADO' ? 'badge badge-success' : 'badge badge-warning'}" 
+                              th:text="${c.estado}"></span>
+                    </td>
+                    <td>
+                        <a th:href="@{/compras/compras/detalle/{id}(id=${c.id})}" class="btn-view">👁️ Ver Detalle</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(compras)}">
+                    <td colspan="7" style="text-align: center; color: #7f8c8d; padding: 30px;">
+                        No se han registrado facturas de compra aún.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

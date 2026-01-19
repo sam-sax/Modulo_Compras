@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Notas de Remisión - Stock</title>
+    <style>
+        /* Requisito: Flush with the top + espacio para menú fixed */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            padding-top: 70px; 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #f0f2f5; 
+        }
+        
+        .header { 
+            background: #2980b9; 
+            color: white; 
+            padding: 15px 25px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .header h2 { margin: 0; }
+        
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        
+        .search-card { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+        }
+        
+        .btn-new { 
+            background: white; 
+            color: #2980b9; 
+            padding: 8px 15px; 
+            text-decoration: none; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            transition: background 0.3s;
+        }
+        .btn-new:hover { background: #e8f4fd; }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: white; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        th { background: #34495e; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        
+        .badge-stock { 
+            background: #d4edda; 
+            color: #155724; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header">
+        <h2>Control de Notas de Remisión</h2>
+        <a th:href="@{/compras/remisiones/nuevo}" class="btn-new">+ Nueva Remisión</a>
+    </div>
+
+    <div class="container">
+        <div class="search-card">
+            <form th:action="@{/compras/remisiones/vista}" method="get" style="display:flex; gap:10px; width:100%;">
+                <input type="text" name="numero" th:value="${numero}" placeholder="Buscar por número de nota..." style="flex:1; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                <button type="submit" style="padding:8px 20px; cursor:pointer; background:#34495e; color:white; border:none; border-radius:4px;">Buscar</button>
+                <a th:href="@{/compras/remisiones/vista}" style="padding:8px; color:#666; text-decoration:none;">Limpiar</a>
+            </form>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Número</th>
+                    <th>Proveedor</th>
+                    <th>Vendedor/Transporte</th>
+                    <th>Estado Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="r : ${remisiones}">
+                    <td th:text="${#temporals.format(r.fecha, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${r.numero}" style="font-weight:bold; color:#2980b9;"></td>
+                    <td th:text="${r.proveedor.razonSocial}"></td>
+                    <td th:text="${r.vendedor != null ? r.vendedor.nombre : 'N/A'}"></td>
+                    <td><span class="badge-stock">INGRESADO</span></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(remisiones)}">
+                    <td colspan="5" style="text-align: center; color: #95a5a6; padding: 20px;">No se encontraron notas de remisión.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

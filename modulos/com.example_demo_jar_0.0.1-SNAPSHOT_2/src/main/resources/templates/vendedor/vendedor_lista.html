@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Vendedores</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f2f2f2; margin: 0; } /* Margen 0 para el menú */
+        
+        .header-section { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background-color: #ffffff; 
+            padding: 20px 30px; 
+            border-bottom: 2px solid #1a73e8;
+        }
+        
+        .header-section h1 { margin: 0; font-size: 22px; color: #1a73e8; }
+        
+        .btn-nuevo { 
+            padding: 10px 20px; 
+            font-size: 14px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            background-color: #28a745; 
+            color: white; 
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; color: #333; font-weight: 600; text-transform: uppercase; font-size: 12px; }
+        tr:hover { background-color: #f9f9f9; }
+        
+        .badge-activo { background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-inactivo { background: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header-section">
+        <h1><i class="fa fa-users"></i> Listado de Vendedores</h1>
+        <div class="buttons">
+            <a th:href="@{/admin/vendedor/registrar}" class="btn-nuevo">+ Nuevo Vendedor</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Persona (Nombre Completo)</th>
+                    <th>Código Vendedor</th>
+                    <th>Usuario de Acceso</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="v : ${vendedores}">
+                    <td th:text="${v.id}"></td>
+                    <td th:text="${(v.persona.nombres != null ? v.persona.nombres + ' ' + v.persona.apellidos : v.persona.razonSocial)}" style="font-weight: bold;"></td>
+                    <td th:text="${v.codigoVendedor}"></td>
+                    <td>
+                        <code th:text="${v.usuario.usuario}" style="color: #e83e8c;"></code>
+                    </td>
+                    <td>
+                        <span th:class="${v.activo ? 'badge-activo' : 'badge-inactivo'}" 
+                              th:text="${v.activo ? 'ACTIVO' : 'INACTIVO'}">
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

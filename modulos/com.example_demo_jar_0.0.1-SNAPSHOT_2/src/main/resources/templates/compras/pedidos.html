@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Pedidos</title>
+    <style>
+        /* Requisito: Flush with the top + espacio para menú fixed */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            padding-top: 70px; 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #f4f7f6; 
+        }
+
+        .navbar-internal { 
+            background: #8e44ad; 
+            color: white; 
+            padding: 15px 25px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+
+        .container { padding: 20px; }
+        
+        .card { 
+            background: white; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            padding: 20px; 
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6; color: #444; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+
+        /* Badges de Estado */
+        .badge { padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; display: inline-block; }
+        .status-BORRADOR { background: #dcdde1; color: #2f3640; }
+        .status-APROBADO { background: #d4edda; color: #155724; }
+        .status-ANULADO { background: #f8d7da; color: #721c24; }
+
+        /* Botones */
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-weight: bold; font-size: 0.9rem; transition: 0.3s; }
+        .btn-new { background: white; color: #8e44ad; }
+        .btn-new:hover { background: #f1f1f1; }
+        
+        .btn-approve { background: #27ae60; color: white; margin-right: 5px; }
+        .btn-approve:hover { background: #219150; }
+        
+        .btn-cancel { background: #e74c3c; color: white; }
+        .btn-cancel:hover { background: #c0392b; }
+
+        .btn-action-link { color: #3498db; text-decoration: none; font-weight: bold; }
+        .btn-action-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="navbar-internal">
+        <h2 style="margin:0;">Listado de Pedidos Internos</h2>
+        <a th:href="@{/compras/pedidos/nuevo}" class="btn btn-new">+ Nuevo Pedido</a>
+    </div>
+
+    <div class="container">
+        <div th:if="${mensaje}" 
+             style="background: #d4edda; color: #155724; padding: 12px; border-radius: 5px; margin-bottom: 20px; border-left: 5px solid #28a745;" 
+             th:text="${mensaje}">
+        </div>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="100">ID Pedido</th>
+                        <th>Fecha de Solicitud</th>
+                        <th>Estado Actual</th>
+                        <th style="text-align: center;">Acciones / Flujo de Trabajo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${pedidos}">
+                        <td th:text="${'# ' + p.id}" style="font-weight: bold; color: #7f8c8d;"></td>
+                        <td th:text="${#temporals.format(p.fecha, 'dd/MM/yyyy')}"></td>
+                        <td>
+                            <span th:class="'badge status-' + ${p.estado}" th:text="${p.estado}"></span>
+                        </td>
+                        <td style="text-align: center;">
+                            <div th:if="${p.estado.name() == 'BORRADOR'}">
+                                <form th:action="@{/compras/pedidos/aprobar/{id}(id=${p.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-approve">Aprobar</button>
+                                </form>
+                                <form th:action="@{/compras/pedidos/anular/{id}(id=${p.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-cancel" onclick="return confirm('¿Seguro que desea anular este pedido?')">Anular</button>
+                                </form>
+                            </div>
+
+                            <div th:if="${p.estado.name() == 'APROBADO'}">
+                                <a th:href="@{/compras/ordenes/nuevo-desde-pedido/{id}(id=${p.id})}" class="btn-action-link">
+                                    📦 Generar Orden de Compra
+                                </a>
+                            </div>
+
+                            <div th:if="${p.estado.name() == 'ANULADO'}">
+                                <span style="color: #95a5a6; font-style: italic;">Sin acciones</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(pedidos)}">
+                        <td colspan="4" style="text-align: center; padding: 40px; color: #95a5a6;">
+                            No hay pedidos pendientes de procesar.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

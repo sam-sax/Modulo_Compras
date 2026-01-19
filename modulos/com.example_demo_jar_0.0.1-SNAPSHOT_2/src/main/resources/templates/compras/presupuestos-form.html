@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Presupuesto - Detalle</title>
+    <style>
+        body, html { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; }
+        .header { background: #2980b9; color: white; padding: 20px; text-align: center; }
+        .container { padding: 25px; max-width: 1000px; margin: 0 auto; }
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
+        .form-group { flex: 1; display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 8px; color: #34495e; font-size: 0.9rem; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; outline: none; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; background: #f8f9fa; border-bottom: 2px solid #dee2e6; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .summary-container { margin-top: 20px; display: flex; flex-direction: column; align-items: flex-end; }
+        .summary-line { width: 250px; display: flex; justify-content: space-between; padding: 5px 0; }
+        .total-bold { font-size: 1.2rem; font-weight: bold; color: #27ae60; border-top: 2px solid #eee; margin-top: 10px; padding-top: 10px; }
+        .btn-add { background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        .btn-submit { background: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header">
+        <h2 style="margin:0;">Cargar Presupuesto de Proveedor</h2>
+    </div>
+
+    <div class="container">
+        <form th:action="@{/compras/presupuestos/guardar}" th:object="${presupuestoDTO}" method="post">
+            <div class="card">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Proveedor</label>
+                        <select th:field="*{proveedorId}" required>
+                            <option value="">Seleccione...</option>
+                            <option th:each="p : ${proveedores}" th:value="${p.id}" th:text="${p.razonSocial}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Número de Presupuesto</label>
+                        <input type="text" th:field="*{numero}" placeholder="Ej: PR-1020" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" th:field="*{fecha}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-header">
+                    <h3 style="margin:0;">Detalle de Productos Cotizados</h3>
+                    <button type="button" class="btn-add" onclick="agregarFila()">+ Agregar Producto</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="40%">Producto</th>
+                            <th width="15%">Cant.</th>
+                            <th width="20%">Precio Unit.</th>
+                            <th width="20%">Subtotal</th>
+                            <th width="5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoDetalles"></tbody>
+                </table>
+
+                <div class="summary-container">
+                    <div class="summary-line">
+                        <span>Subtotal:</span>
+                        <span>$ <span id="txtSubtotal">0.00</span></span>
+                    </div>
+                    <div class="summary-line">
+                        <span>IVA (10%):</span>
+                        <span>$ <span id="txtIva">0.00</span></span>
+                    </div>
+                    <div class="summary-line total-bold">
+                        <span>Total General:</span>
+                        <span>$ <span id="txtTotal">0.00</span></span>
+                    </div>
+                    
+                    <input type="hidden" th:field="*{subtotal}" id="hiddenSubtotal">
+                    <input type="hidden" th:field="*{iva}" id="hiddenIva">
+                    <input type="hidden" th:field="*{total}" id="hiddenTotal">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">GUARDAR PRESUPUESTO</button>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        let contador = 0;
+        const productos = [[${productos}]]; 
+
+        function agregarFila() {
+            const tbody = document.getElementById('cuerpoDetalles');
+            const fila = document.createElement('tr');
+            let opciones = productos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+            
+            fila.innerHTML = `
+                <td>
+                    <select name="items[${contador}].productoId" style="width:100%" required>
+                        <option value="">Seleccionar...</option>
+                        ${opciones}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="items[${contador}].cantidad" value="1" min="1" 
+                           oninput="recalcular(this)" style="width:100%" required>
+                </td>
+                <td>
+                    <input type="number" name="items[${contador}].precioUnitario" step="0.01" value="0" 
+                           oninput="recalcular(this)" style="width:100%" required>
+                </td>
+                <td>
+                    <strong>$ <span class="subtotal-fila">0.00</span></strong>
+                </td>
+                <td>
+                    <button type="button" onclick="this.closest('tr').remove(); actualizarTotales();" style="color:red; border:none; background:none; cursor:pointer;">✕</button>
+                </td>
+            `;
+            tbody.appendChild(fila);
+            contador++;
+        }
+
+        function recalcular(input) {
+            const fila = input.closest('tr');
+            const cant = parseFloat(fila.querySelector('input[name*="cantidad"]').value) || 0;
+            const precio = parseFloat(fila.querySelector('input[name*="precioUnitario"]').value) || 0;
+            fila.querySelector('.subtotal-fila').innerText = (cant * precio).toFixed(2);
+            actualizarTotales();
+        }
+
+        function actualizarTotales() {
+            let subtotal = 0;
+            document.querySelectorAll('.subtotal-fila').forEach(span => {
+                subtotal += parseFloat(span.innerText) || 0;
+            });
+            let iva = subtotal * 0.10;
+            let total = subtotal + iva;
+
+            document.getElementById('txtSubtotal').innerText = subtotal.toFixed(2);
+            document.getElementById('txtIva').innerText = iva.toFixed(2);
+            document.getElementById('txtTotal').innerText = total.toFixed(2);
+
+            document.getElementById('hiddenSubtotal').value = subtotal.toFixed(2);
+            document.getElementById('hiddenIva').value = iva.toFixed(2);
+            document.getElementById('hiddenTotal').value = total.toFixed(2);
+        }
+
+        window.onload = agregarFila;
+    </script>
+</body>
+</html>

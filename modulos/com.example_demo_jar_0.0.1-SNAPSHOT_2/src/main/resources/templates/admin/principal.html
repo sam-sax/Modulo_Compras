@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Principal Admin</title>
+    <style>
+        /* REGLA: Totalmente pegado arriba (Flush) */
+        body, html { 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .container { 
+            max-width: 100%; /* Cambiado a 100% para ocupar todo el ancho */
+            margin: 0 !important; 
+            padding: 25px; 
+            background-color: white; 
+            border-radius: 0; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+            min-height: 100vh;
+        }
+
+        .header-panel { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 15px; 
+            margin-bottom: 20px;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #718096; text-transform: uppercase; font-size: 11px; }
+        
+        .btn-update { background: #4267B2; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+        .btn-update:hover { background: #365899; }
+        select { padding: 5px; border-radius: 4px; border: 1px solid #cbd5e0; }
+
+        /* Estilo para resaltar la persona con su ID */
+        .persona-info {
+            color: #2d3748;
+            font-weight: 500;
+        }
+        .id-badge {
+            color: #718096;
+            font-size: 0.85em;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+   <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="container">
+        <div class="header-panel">
+            <h2 th:text="'Panel de Control: ' + ${nombreCompleto}">Admin</h2>
+            <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy')}"></span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Asignar Rol</th>
+                    <th>Estado</th>
+                    <th>Persona Asociada (ID)</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="u : ${usuarios}">
+                    <td th:text="${u.usuario}" style="font-weight: bold;"></td>
+                    <td>
+                        <form th:action="@{/admin/usuarios/cambiar-rol}" method="post" style="display:flex; gap:5px;">
+                            <input type="hidden" name="id" th:value="${u.id}"/> 
+                            <select name="rol">
+                                <option value="ADMIN" th:selected="${u.rol == 'ADMIN'}">ADMIN</option>
+                                <option value="USER" th:selected="${u.rol == 'USER'}">USER</option>
+                                <option value="VENDEDOR" th:selected="${u.rol == 'VENDEDOR'}">VENDEDOR</option>
+                                <option value="COMPRADOR" th:selected="${u.rol == 'COMPRADOR'}">COMPRADOR</option>
+                            </select>
+                            <button type="submit" class="btn-update">Actualizar</button>
+                        </form>
+                    </td>
+                    <td th:text="${u.estado ? 'Activo' : 'Inactivo'}"></td>
+                    
+                    <td class="persona-info" th:text="${u.nombreCompletoPersona != null ? u.nombreCompletoPersona : 'Sin asignar'}"></td>
+                    
+                    <td>
+                        <a th:href="@{/admin/usuarios/desactivar/{id}(id=${u.id})}" style="color:red; font-size: 0.9em;">Desactivar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

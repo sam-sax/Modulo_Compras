@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cierre Contable - Compras</title>
+    <style>
+        /* Requisito: Flush with the top + espacio para el menú fixed */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            padding-top: 70px; /* Evita que el fragmento tape el header */
+            font-family: 'Segoe UI', sans-serif; 
+            background: #f8f9fa; 
+        }
+        .header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+        .container { padding: 40px; max-width: 500px; margin: 0 auto; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-run { background: #e74c3c; color: white; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: background 0.3s; }
+        .btn-run:hover { background: #c0392b; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; font-size: 0.9rem; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        
+        label { display: block; margin-bottom: 10px; font-weight: bold; color: #34495e; }
+        input[type="date"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header">
+        <h2 style="margin:0;">Cierre de Módulo Compras</h2>
+    </div>
+
+    <div class="container">
+        <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        
+        <div class="card">
+            <form th:action="@{/compras/cierre/procesar}" method="post">
+                <label>Fecha de Corte:</label>
+                <input type="date" name="fecha" required>
+                
+                <p style="color: #7f8c8d; font-size: 0.85rem; margin-top: 15px; line-height: 1.4;">
+                    <strong>Aviso:</strong> Este proceso consolidará las facturas y generará los asientos contables definitivos. Esta acción no se puede deshacer.
+                </p>
+                
+                <button type="submit" class="btn-run" onclick="return confirm('¿Está seguro de procesar el cierre contable?')">
+                    GENERAR CIERRE
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

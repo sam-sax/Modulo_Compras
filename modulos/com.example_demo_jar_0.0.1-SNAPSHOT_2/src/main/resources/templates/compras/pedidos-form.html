@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva Solicitud de Pedido</title>
+    <style>
+        /* Requisito: Flush with the top */
+        body, html { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; }
+        .header-nav { background: #8e44ad; color: white; padding: 20px; text-align: center; border-bottom: 4px solid #732d91; }
+        .container { padding: 20px; max-width: 900px; margin: 0 auto; }
+        .card { background: white; border-radius: 8px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; }
+        input[type="date"], select, input[type="number"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fafafa; border-radius: 4px; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid #8e44ad; color: #8e44ad; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        
+        .btn-add { background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-add:hover { background: #2980b9; }
+        .btn-save { background: #27ae60; color: white; border: none; padding: 15px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 1.1rem; font-weight: bold; margin-top: 25px; transition: 0.3s; }
+        .btn-save:hover { background: #219150; }
+        .btn-del { background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header-nav">
+        <h2 style="margin:0;">📝 Registrar Nueva Solicitud de Pedido</h2>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <form th:action="@{/compras/pedidos/guardar}" th:object="${pedidoDTO}" method="post">
+                <div class="form-group">
+                    <label>Fecha de la Solicitud</label>
+                    <input type="date" th:field="*{fecha}" required>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+                    <h3 style="margin:0; color: #2c3e50;">Lista de Productos Solicitados</h3>
+                    <button type="button" class="btn-add" onclick="agregarFila()">+ Añadir Producto</button>
+                </div>
+                
+                <table id="tablaItems">
+                    <thead>
+                        <tr>
+                            <th width="70%">Producto / Insumo</th>
+                            <th width="20%">Cantidad</th>
+                            <th width="10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoItems">
+                        </tbody>
+                </table>
+
+                <button type="submit" class="btn-save">CONFIRMAR Y GUARDAR SOLICITUD</button>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a th:href="@{/compras/pedidos/vista}" style="color: #7f8c8d; text-decoration: none; font-size: 0.9rem;">← Cancelar y volver al listado</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        let index = 0;
+        const productos = [[${productos}]];
+
+        function agregarFila() {
+            const tbody = document.getElementById('cuerpoItems');
+            const fila = document.createElement('tr');
+            
+            let opciones = productos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+            
+            fila.innerHTML = `
+                <td>
+                    <select name="items[${index}].productoId" required>
+                        <option value="">-- Seleccionar Producto --</option>
+                        ${opciones}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="items[${index}].cantidad" min="1" value="1" required>
+                </td>
+                <td style="text-align: center;">
+                    <button type="button" class="btn-del" onclick="this.parentElement.parentElement.remove()">✕</button>
+                </td>
+            `;
+            tbody.appendChild(fila);
+            index++;
+        }
+
+        // Fila inicial automática
+        window.onload = function() {
+            if (document.getElementById('cuerpoItems').children.length === 0) {
+                agregarFila();
+            }
+        };
+    </script>
+</body>
+</html>

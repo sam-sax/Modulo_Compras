@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Ajuste de Inventario</title>
+    <style>
+        /* Agregado padding-top para que el fragmento no tape el contenido */
+        body, html { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; }
+        .header { background: #34495e; color: white; padding: 20px; text-align: center; }
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 5px; color: #333; }
+        select, input, textarea { padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
+        .btn-submit { background: #1abc9c; color: white; border: none; padding: 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        .btn-submit:hover { background: #16a085; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header">
+        <h2>Registrar Ajuste Manual de Stock</h2>
+    </div>
+    <div class="container">
+        <div class="card">
+            <form th:action="@{/compras/ajustes/guardar}" th:object="${ajusteDTO}" method="post">
+                <div class="form-group">
+                    <label>Producto</label>
+                    <select th:field="*{productoId}" required>
+                        <option value="">-- Seleccione un Producto --</option>
+                        <option th:each="p : ${productos}" th:value="${p.id}" th:text="${p.nombre}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Ajuste</label>
+                    <select th:field="*{tipo}" required>
+                        <option value="ENTRADA">ENTRADA (Aumentar Stock)</option>
+                        <option value="SALIDA">SALIDA (Disminuir Stock)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <input type="number" th:field="*{cantidad}" step="0.01" min="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Motivo / Observación</label>
+                    <textarea th:field="*{motivo}" rows="3" placeholder="Ej: Rotura, Vencimiento, Error de conteo..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Procesar Ajuste e Inventario</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

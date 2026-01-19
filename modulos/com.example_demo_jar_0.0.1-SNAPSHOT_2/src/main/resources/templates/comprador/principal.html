@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Compras</title>
+    <style>
+        /* Flush with the top asegurado */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f0f2f5; 
+            display: flex; /* Para alinear sidebar y contenido */
+        }
+        
+        /* --- ESTILOS SIDEBAR ACORDEON --- */
+        .sidebar-acordeon {
+            width: 260px;
+            background: #2c3e50;
+            min-height: 100vh;
+            color: white;
+            padding-top: 20px;
+        }
+
+        .acordeon-header {
+            padding: 15px 20px;
+            background: #1a252f;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .acordeon-content {
+            background: #34495e;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        /* Clase para abrir el acordeón */
+        .acordeon-content.open {
+            max-height: 600px; /* Suficiente para todos los links */
+        }
+
+        .acordeon-content a {
+            display: block;
+            padding: 12px 25px;
+            color: #bdc3c7;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #2c3e50;
+        }
+
+        .acordeon-content a:hover {
+            background: #3e5871;
+            color: white;
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main-wrapper {
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: 40px auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            text-align: center;
+        }
+        
+        .role-badge {
+            background: #fff3e0;
+            color: #ef6c00;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-nav {
+            background: #ef6c00;
+            color: white;
+            text-decoration: none;
+            padding: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-nav:hover { background: #e65100; }
+
+        .instruction-card {
+            background: #e8f5e9;
+            border-left: 5px solid #2e7d32;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar-acordeon">
+        <div class="acordeon-item">
+            <div class="acordeon-header" id="toggleCompras">
+                📦 MÓDULO COMPRAS <span id="arrow">▼</span>
+            </div>
+            <div class="acordeon-content" id="menuCompras">
+                <a th:href="@{/compras/ordenes/vista}">Órdenes</a>
+                <a th:href="@{/compras/ordenes/reporte}">Reporte Órdenes</a>
+                <a th:href="@{/compras/productos/vista}">Productos</a>
+                <a th:href="@{/compras/proveedores/vista}">Proveedores</a>
+                <a th:href="@{/compras/pedidos/vista}">Pedidos</a>
+                <a th:href="@{/compras/presupuestos/vista}">Presupuestos</a>
+                <a th:href="@{/compras/ajustes/vista}">Ajustes</a>
+                <a th:href="@{/compras/compras/vista}">Compras</a>
+                <a th:href="@{/compras/cuentas/vista}">Cuentas</a>
+                <a th:href="@{/compras/libro/vista}">Libro Compras</a>
+                <a th:href="@{/compras/notas-credito/vista}">Notas Crédito</a>
+                <a th:href="@{/compras/notas-debito/vista}">Notas Débito</a>
+                <a th:href="@{/compras/remisiones/vista}">Remisiones</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+        <div class="container">
+            <span style="font-size: 50px; display:block; margin-bottom:20px;">🛒</span>
+            <h1 th:text="'¡Hola, ' + ${usuarioActual} + '!'">Bienvenido</h1>
+            <div class="role-badge">Departamento de Compras</div>
+            
+            <p>Bienvenido al módulo de gestión de proveedores y stock.</p>
+            
+            <hr>
+
+            <div class="quick-actions">
+                <a th:href="@{/compras/pedidos/vista}" class="btn-nav">
+                    <span>📋 Pedidos Internos</span>
+                </a>
+                <a th:href="@{/compras/ordenes/vista}" class="btn-nav">
+                    <span>📝 Órdenes de Compra</span>
+                </a>
+                <a th:href="@{/compras/ajustes/vista}" class="btn-nav">
+                    <span>🔧 Ajustes de Stock</span>
+                </a>
+            </div>
+
+            <div class="instruction-card">
+                <h3 style="margin-top: 0; color: #1b5e20;">📊 Gestión de Operaciones</h3>
+                <p>Utiliza los botones superiores o el menú lateral para navegar. Las <b>Órdenes de Compra</b> afectan directamente al stock.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('toggleCompras').addEventListener('click', function() {
+            const content = document.getElementById('menuCompras');
+            const arrow = document.getElementById('arrow');
+            
+            content.classList.toggle('open');
+            
+            if (content.classList.contains('open')) {
+                arrow.innerText = '▲';
+            } else {
+                arrow.innerText = '▼';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Principal - Vendedor</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; }
+        
+        .container { 
+            max-width: 900px; 
+            margin: 60px auto; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            text-align: center;
+        }
+
+        .welcome-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        
+        .role-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .instruction-card {
+            background: #fff9db;
+            border-left: 5px solid #fcc419;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+            border-radius: 4px;
+        }
+
+        p { color: #546e7a; line-height: 1.6; }
+        
+        hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="container">
+        <span class="welcome-icon">💼</span>
+        <h1 th:text="'¡Bienvenido, ' + ${usuarioActual} + '!'">Bienvenido</h1>
+        <div class="role-badge">Panel de Ventas</div>
+        
+        <p>Has ingresado al sistema con éxito. Tu cuenta tiene permisos de <strong>Vendedor</strong>.</p>
+        
+        <hr>
+
+        <div class="instruction-card">
+            <h3 style="margin-top: 0; color: #856404;">📍 ¿Dónde están mis herramientas?</h3>
+            <p style="margin-bottom: 0;">
+                Hemos movido los accesos rápidos de <strong>Personas</strong> y <strong>Clientes</strong> directamente al 
+                <strong>menú azul superior</strong> para que puedas acceder a ellos desde cualquier parte del sistema sin tener que volver aquí.
+            </p>
+        </div>
+
+        <p style="margin-top: 40px; font-size: 0.9em; color: #90a4ae;">
+            Si necesitas asistencia técnica, contacta con el administrador del sistema.
+        </p>
+    </div>
+</body>
+</html>

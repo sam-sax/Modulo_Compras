@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Libro Compras - Reportes Fiscales</title>
+    <style>
+        body, html { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; }
+        .header-report { background: #16a085; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #0e6655; }
+        .header-report h2 { margin: 0; }
+        .container { padding: 20px; max-width: 1300px; margin: 0 auto; }
+        .filter-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .filter-row { display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-group label { font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; color: #34495e; }
+        select, input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; outline: none; }
+        .btn-search { background: #16a085; color: white; border: none; padding: 9px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-clear { background: #95a5a6; color: white; text-decoration: none; padding: 9px 20px; border-radius: 4px; font-size: 0.9rem; }
+        .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #34495e; color: white; padding: 12px; text-align: left; font-size: 0.85rem; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .monto { text-align: right; font-family: 'Consolas', monospace; font-weight: bold; }
+        .iva-result-box { margin-top: 20px; background: #2c3e50; color: white; padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .iva-amount { font-size: 1.8rem; color: #1abc9c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+    <div class="header-report">
+        <h2>Libro de Compras Fiscal</h2>
+        <div style="font-size: 0.9rem;">Periodo: <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM yyyy')}"></span></div>
+    </div>
+    <div class="container">
+        <div class="filter-card">
+            <form th:action="@{/compras/libro/vista}" method="get">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Proveedor</label>
+                        <select name="proveedorId">
+                            <option value="">-- Todos --</option>
+                            <option th:each="p : ${proveedores}" th:value="${p.id}" th:text="${p.razonSocial}" th:selected="${p.id == param.proveedorId}"></option>
+                        </select>
+                    </div>
+                    <div class="filter-group" style="width: 80px;"><label>Mes</label><input type="number" name="mes" min="1" max="12" th:value="${mesFiltro}"></div>
+                    <div class="filter-group" style="width: 100px;"><label>Año</label><input type="number" name="anio" th:value="${anioFiltro}"></div>
+                    <button type="submit" class="btn-search">Actualizar Reporte</button>
+                    <a th:href="@{/compras/libro/vista}" class="btn-clear">Limpiar</a>
+                </div>
+            </form>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th><th>Factura</th><th>Timbrado</th><th>Proveedor</th><th class="monto">Base Imponible</th><th class="monto">IVA (10%)</th><th class="monto">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="l : ${libros}">
+                        <td th:text="${#temporals.format(l.compra.fecha, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${l.numeroFactura}"></td>
+                        <td th:text="${l.timbrado}"></td>
+                        <td th:text="${l.compra.proveedor.razonSocial}"></td>
+                        <td class="monto" th:text="${#numbers.formatDecimal(l.baseImponible, 1, 'POINT', 0, 'COMMA')}"></td>
+                        <td class="monto" style="color: #e67e22;" th:text="${#numbers.formatDecimal(l.ivaCredito, 1, 'POINT', 0, 'COMMA')}"></td>
+                        <td class="monto" th:text="${#numbers.formatDecimal(l.totalFactura, 1, 'POINT', 0, 'COMMA')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="iva-result-box" th:if="${ivaMensual != null}">
+            <div><h3 style="margin: 0;">Total IVA Crédito del Periodo</h3><small th:text="'Suma fiscal de facturas registradas'"></small></div>
+            <div class="iva-amount">Gs. <span th:text="${#numbers.formatDecimal(ivaMensual, 1, 'POINT', 0, 'COMMA')}"></span></div>
+        </div>
+    </div>
+</body>
+</html>

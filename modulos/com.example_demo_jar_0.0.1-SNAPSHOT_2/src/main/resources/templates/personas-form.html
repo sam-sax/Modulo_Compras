@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Personas</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+        .form-container { background: #fff; padding: 30px; border-radius: 12px; max-width: 850px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,.1); }
+        h1 { color: #1a73e8; border-bottom: 2px solid #e8f0fe; padding-bottom: 10px; margin-bottom: 25px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; }
+        input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ced4da; }
+        .radio-group { display: flex; gap: 30px; background: #f8f9fa; padding: 10px; border-radius: 6px; }
+        .checkbox-group { display: flex; gap: 15px; flex-wrap: wrap; padding: 12px; background: #e8f0fe; border-radius: 6px; }
+        button { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #1557b0; }
+        .btn-cancelar { display: block; margin-top: 15px; text-align: center; color: #555; text-decoration: none; }
+        .error-msg { color: red; font-size: 12px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+    <div class="form-container">
+<div class="form-container">
+    <h1 th:text="${personaDTO.idPersona != null ? 'Actualizar Información' : 'Registro de Nueva Persona'}"></h1>
+
+    <form th:action="@{/personas/guardar}" th:object="${personaDTO}" method="post">
+       <input type="hidden" th:field="*{idPersona}" />
+
+        <div class="form-group">
+            <label>Naturaleza del Registro</label>
+            <div class="radio-group">
+                <label><input type="radio" th:field="*{tipoPersona}" value="FISICA"/> Persona Física</label>
+                <label><input type="radio" th:field="*{tipoPersona}" value="JURIDICA"/> Persona Jurídica</label>
+            </div>
+        </div>
+
+        <div id="seccionFisica">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div class="form-group">
+                    <label>Nombres</label>
+                    <input type="text" th:field="*{nombres}">
+                </div>
+                <div class="form-group">
+                    <label>Apellidos</label>
+                    <input type="text" th:field="*{apellidos}">
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div class="form-group">
+                    <label>N° Cédula</label>
+                    <input type="text" th:field="*{numeroCedula}">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Nacimiento</label>
+                    <input type="date" th:field="*{fechaNacimiento}" id="fechaNacimiento">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Estado Civil</label>
+                <select th:field="*{estadoCivil}">
+                    <option value="">-- Seleccionar --</option>
+                    <option value="SOLTERO/A">Soltero/a</option>
+                    <option value="CASADO/A">Casado/a</option>
+                    <option value="DIVORCIADO/A">Divorciado/a</option>
+                    <option value="VIUDO/A">Viudo/a</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="seccionJuridica" style="display:none;">
+            <div class="form-group">
+                <label>Razón Social</label>
+                <input type="text" th:field="*{razonSocial}">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div class="form-group">
+                    <label>RUC</label>
+                    <input type="text" th:field="*{ruc}">
+                </div>
+                <div class="form-group">
+                    <label>Representante Legal</label>
+                    <input type="text" th:field="*{representanteLegal}">
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" th:field="*{telefono}">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" th:field="*{email}">
+                <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-msg"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" th:field="*{direccion}">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+            <div class="form-group">
+                <label>País</label>
+                <select id="comboPais">
+                    <option value="">-- Seleccionar País --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ciudad</label>
+                <select th:field="*{ciudadId}" id="comboCiudad">
+                    <option value="">-- Seleccionar Ciudad --</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Roles asignados</label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" th:field="*{esProveedor}"> Proveedor</label>
+                <label><input type="checkbox" th:field="*{esVendedor}"> Vendedor</label>
+                <label><input type="checkbox" th:field="*{esCliente}"> Cliente</label>
+                <label><input type="checkbox" th:field="*{esComprador}"> Comprador</label>
+            </div>
+        </div>
+
+        <button type="submit">Guardar Cambios</button>
+        <a th:href="${linkPrincipal}" class="btn-cancelar">Cancelar y salir</a>
+    </form>
+</div>
+
+<script th:inline="javascript">
+document.addEventListener("DOMContentLoaded", () => {
+    const fisica = document.getElementById("seccionFisica");
+    const juridica = document.getElementById("seccionJuridica");
+    const radios = document.querySelectorAll("input[name='tipoPersona']");
+    const comboPais = document.getElementById("comboPais");
+    const comboCiudad = document.getElementById("comboCiudad");
+    const ciudadIdGuardada = /*[[${personaDTO.ciudadId}]]*/ null;
+    const PARAGUAY_ID = 171;
+
+    function actualizarTipo() {
+        const tipo = document.querySelector("input[name='tipoPersona']:checked")?.value;
+        if (tipo === "JURIDICA") {
+            fisica.style.display = "none";
+            juridica.style.display = "block";
+        } else {
+            fisica.style.display = "block";
+            juridica.style.display = "none";
+        }
+    }
+    radios.forEach(r => r.addEventListener("change", actualizarTipo));
+    actualizarTipo();
+
+    function cargarCiudades(paisId, seleccionadoId) {
+        if (!paisId) return;
+        fetch(`/api/ciudades/por-pais/${paisId}`)
+            .then(res => res.json())
+            .then(ciudades => {
+                comboCiudad.innerHTML = '<option value="">-- Seleccionar Ciudad --</option>';
+                ciudades.forEach(c => {
+                    const opt = document.createElement("option");
+                    opt.value = c.id;
+                    opt.textContent = c.nombre;
+                    if (seleccionadoId && String(c.id) === String(seleccionadoId)) opt.selected = true;
+                    comboCiudad.appendChild(opt);
+                });
+            });
+    }
+
+    fetch('/api/paises')
+        .then(res => res.json())
+        .then(paises => {
+            paises.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.id;
+                opt.textContent = p.nombre;
+                if(p.id == PARAGUAY_ID) opt.selected = true;
+                comboPais.appendChild(opt);
+            });
+            cargarCiudades(comboPais.value, ciudadIdGuardada);
+        });
+
+    comboPais.addEventListener("change", () => cargarCiudades(comboPais.value, null));
+});
+</script>
+</body>
+</html>

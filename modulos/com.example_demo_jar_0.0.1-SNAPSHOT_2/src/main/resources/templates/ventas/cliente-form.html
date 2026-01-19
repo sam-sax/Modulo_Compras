@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Formulario Cliente</title></head>
+<body style="font-family: Arial, sans-serif; background-color: #f9f9f9;">
+    <br>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+    <div style="max-width: 600px; margin: 40px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <h2 style="text-align:center; color: #2196F3;">Asignar Rol de Cliente</h2>
+        <form th:action="@{/clientes/guardar}" th:object="${clienteDTO}" method="post">
+        <input type="hidden" th:field="*{idCliente}" />
+        
+        <table border="1" align="center" cellpadding="15" cellspacing="0" bgcolor="white" width="500">
+            <tr bgcolor="#2196F3" style="color:white">
+                <th colspan="2">ASIGNAR ROL DE CLIENTE</th>
+            </tr>
+            <tr>
+                <td><b>Seleccionar Persona:</b></td>
+                <td>
+                    <select th:field="*{idPersona}" th:if="*{idCliente == null}" required style="width:100%">
+                        <option value="">-- Seleccione --</option>
+                        <option th:each="p : ${personasDisponibles}" 
+                                th:value="${p.idPersona}" 
+                                th:text="${(p.nombres ?: '') + ' ' + (p.apellidos ?: '') + (p.razonSocial ?: '') + ' [' + (p.numeroCedula ?: p.ruc) + ']'}"></option>
+                    </select>
+                    <input type="hidden" th:field="*{idPersona}" th:if="*{idCliente != null}" />
+                    <span th:if="*{idCliente != null}" style="color:gray">Persona vinculada (No editable)</span>
+                </td>
+            </tr>
+            <tr>
+                <td><b>Límite de Crédito:</b></td>
+                <td><input type="number" th:field="*{limiteCredito}" required style="width:95%" min="0"></td>
+            </tr>
+            <tr>
+                <td><b>Estado:</b></td>
+                <td>
+                    <select th:field="*{activo}" style="width:100%">
+                        <option th:value="true">Activo</option>
+                        <option th:value="false">Inactivo</option>
+                    </select>
+                </td>
+            </tr>
+            <tr bgcolor="#f1f1f1">
+                <td colspan="2" align="center">
+                    <button type="submit" style="padding:10px 20px; background-color:#4CAF50; color:white; border:none; cursor:pointer;">Guardar Cliente</button>
+                    <button type="button" onclick="window.location.href='/clientes/listado'" style="padding:10px 20px; background-color:#f44336; color:white; border:none; cursor:pointer;">Cancelar</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Remisión</title>
+    <style>
+        /* Requisito: Flush with the top + espacio para el menú fixed */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            padding-top: 70px; /* Ajuste para el fragmento de menú */
+            font-family: 'Segoe UI', sans-serif; 
+            background: #f4f7f6; 
+        }
+        .header { background: #2980b9; color: white; padding: 20px; text-align: center; }
+        .container { padding: 20px; max-width: 900px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .col { flex: 1; display: flex; flex-direction: column; }
+        label { font-weight: bold; font-size: 0.85rem; margin-bottom: 5px; color: #555; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; outline: none; }
+        input:focus, select:focus { border-color: #2980b9; }
+        
+        /* Estilos de la tabla de detalles */
+        .table-detalles { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .table-detalles th { padding-bottom: 10px; border-bottom: 2px solid #eee; color: #34495e; }
+        .table-detalles td { padding: 8px 0; }
+        
+        .btn-add { background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; margin-top: 10px; }
+        .btn-submit { background: #27ae60; color: white; padding: 15px; border: none; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: background 0.3s; }
+        .btn-submit:hover { background: #219150; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header">
+        <h2>Registrar Entrada de Mercadería (Remisión)</h2>
+    </div>
+
+    <div class="container">
+        <form th:action="@{/compras/remisiones/guardar}" th:object="${notaRemisionDTO}" method="post">
+            
+            <div class="card">
+                <div class="row">
+                    <div class="col">
+                        <label>Número de Nota</label>
+                        <input type="text" th:field="*{numero}" placeholder="001-001-0000001" required>
+                    </div>
+                    <div class="col">
+                        <label>Fecha de Recepción</label>
+                        <input type="date" th:field="*{fecha}" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label>Proveedor</label>
+                        <select th:field="*{proveedorId}" required>
+                            <option value="">-- Seleccione Proveedor --</option>
+                            <option th:each="p : ${proveedores}" th:value="${p.id}" th:text="${p.razonSocial}"></option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label>Vendedor / Encargado</label>
+                        <select th:field="*{vendedorId}" required>
+                            <option value="">-- Seleccione Encargado --</option>
+                            <option th:each="v : ${vendedores}" th:value="${v.id}" th:text="${v.nombre}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Detalle de Mercadería</h3>
+                <table class="table-detalles" id="tablaDetalles">
+                    <thead>
+                        <tr>
+                            <th align="left">Producto</th>
+                            <th align="left" width="200">Cantidad Recibida</th>
+                            <th width="50"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoDetalles"></tbody>
+                </table>
+                <button type="button" class="btn-add" onclick="agregarFila()">+ Agregar Ítem</button>
+            </div>
+
+            <button type="submit" class="btn-submit">CONFIRMAR INGRESO A DEPÓSITO</button>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        let contador = 0;
+        const productos = [[${productos}]];
+
+        function agregarFila() {
+            const tbody = document.getElementById('cuerpoDetalles');
+            const fila = document.createElement('tr');
+            
+            let opciones = `<option value="">-- Seleccionar Producto --</option>`;
+            opciones += productos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+            
+            fila.innerHTML = `
+                <td><select name="detalles[${contador}].productoId" required style="width:95%">${opciones}</select></td>
+                <td><input type="number" name="detalles[${contador}].cantidad" value="1" min="1" required style="width:80%"></td>
+                <td align="center"><button type="button" onclick="this.parentElement.parentElement.remove()" style="color:#e74c3c; border:none; background:none; cursor:pointer; font-size:1.2rem;">✕</button></td>
+            `;
+            tbody.appendChild(fila);
+            contador++;
+        }
+        
+        // Cargar primera fila por defecto
+        window.onload = function() {
+            agregarFila();
+        };
+    </script>
+</body>
+</html>

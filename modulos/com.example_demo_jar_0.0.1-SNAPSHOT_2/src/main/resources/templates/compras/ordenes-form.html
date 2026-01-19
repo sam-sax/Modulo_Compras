@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Generar Orden de Compra</title>
+    <style>
+        /* Requisito: Flush with the top */
+        body, html { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; }
+        .header { background: #2c3e50; color: white; padding: 20px; text-align: center; }
+        .container { padding: 25px; max-width: 1000px; margin: 0 auto; }
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        
+        .form-row { display: flex; gap: 20px; margin-bottom: 15px; }
+        .form-group { flex: 1; display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 8px; color: #34495e; font-size: 0.9rem; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; outline: none; background: #fff; }
+        
+        /* Estilo para campos deshabilitados o de solo lectura */
+        input:read-only, select:disabled { background: #f9f9f9; color: #7f8c8d; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; padding: 12px; background: #34495e; color: white; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+
+        .summary-container { margin-top: 20px; display: flex; flex-direction: column; align-items: flex-end; }
+        .summary-line { width: 280px; display: flex; justify-content: space-between; padding: 8px 0; font-size: 1rem; }
+        .total-bold { font-size: 1.4rem; font-weight: bold; color: #27ae60; border-top: 2px solid #eee; margin-top: 10px; padding-top: 10px; }
+
+        .btn-add { background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        .btn-submit { background: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-submit:hover { background: #219150; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header">
+        <h2 style="margin:0;">Nueva Orden de Compra</h2>
+        <p style="margin:5px 0 0 0; font-size: 0.9rem; opacity: 0.8;">Complete los detalles para procesar el pedido</p>
+    </div>
+
+    <div class="container">
+        <form th:action="@{/compras/ordenes/guardar}" th:object="${ordenCompraDTO}" method="post">
+            
+            <div class="card">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Proveedor Responsable</label>
+                        <select th:field="*{proveedorId}" required>
+                            <option value="">Seleccione proveedor...</option>
+                            <option th:each="p : ${proveedores}" th:value="${p.id}" th:text="${p.razonSocial}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Emisión</label>
+                        <input type="date" th:field="*{fecha}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0; color: #2c3e50;">Ítems de la Orden</h3>
+                    <button type="button" class="btn-add" onclick="agregarFila()">+ Agregar Ítem</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="45%">Producto / Insumo</th>
+                            <th width="15%">Cantidad</th>
+                            <th width="20%">Precio Unitario</th>
+                            <th width="15%">Subtotal</th>
+                            <th width="5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoDetalles">
+                        </tbody>
+                </table>
+
+                <div class="summary-container">
+                    <div class="summary-line">
+                        <span>Subtotal Neto:</span>
+                        <span>Gs. <span id="txtSubtotal">0</span></span>
+                    </div>
+                    <div class="summary-line">
+                        <span>IVA Aplicado (10%):</span>
+                        <span>Gs. <span id="txtIva">0</span></span>
+                    </div>
+                    <div class="summary-line total-bold">
+                        <span>TOTAL A PAGAR:</span>
+                        <span>Gs. <span id="txtTotal">0</span></span>
+                    </div>
+                    
+                    <input type="hidden" th:field="*{subtotal}" id="hiddenSubtotal">
+                    <input type="hidden" th:field="*{iva}" id="hiddenIva">
+                    <input type="hidden" th:field="*{totalFinal}" id="hiddenTotal">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">CONFIRMAR Y GENERAR ORDEN</button>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        let contador = 0;
+        const productos = [[${productos}]]; 
+
+        function agregarFila() {
+            const tbody = document.getElementById('cuerpoDetalles');
+            const fila = document.createElement('tr');
+            
+            let opciones = productos.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+            
+            fila.innerHTML = `
+                <td>
+                    <select name="items[${contador}].productoId" style="width:100%" required>
+                        <option value="">Seleccionar producto...</option>
+                        ${opciones}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="items[${contador}].cantidad" value="1" min="1" 
+                           oninput="recalcular(this)" style="width:100%; text-align:center;" required>
+                </td>
+                <td>
+                    <input type="number" name="items[${contador}].precioUnitario" value="0" 
+                           oninput="recalcular(this)" style="width:100%; text-align:right;" required>
+                </td>
+                <td style="text-align:right; font-weight:bold;">
+                    <span class="subtotal-fila">0</span>
+                </td>
+                <td>
+                    <button type="button" onclick="this.closest('tr').remove(); actualizarTotales();" 
+                            style="color:#e74c3c; border:none; background:none; cursor:pointer; font-size:1.2rem;">&times;</button>
+                </td>
+            `;
+            tbody.appendChild(fila);
+            contador++;
+        }
+
+        function recalcular(input) {
+            const fila = input.closest('tr');
+            const cant = parseFloat(fila.querySelector('input[name*="cantidad"]').value) || 0;
+            const precio = parseFloat(fila.querySelector('input[name*="precioUnitario"]').value) || 0;
+            fila.querySelector('.subtotal-fila').innerText = Math.round(cant * precio);
+            actualizarTotales();
+        }
+
+        function actualizarTotales() {
+            let subtotal = 0;
+            document.querySelectorAll('.subtotal-fila').forEach(span => {
+                subtotal += parseFloat(span.innerText) || 0;
+            });
+            
+            let iva = Math.round(subtotal * 0.10);
+            let total = subtotal + iva;
+
+            document.getElementById('txtSubtotal').innerText = subtotal.toLocaleString('es-PY');
+            document.getElementById('txtIva').innerText = iva.toLocaleString('es-PY');
+            document.getElementById('txtTotal').innerText = total.toLocaleString('es-PY');
+
+            document.getElementById('hiddenSubtotal').value = subtotal;
+            document.getElementById('hiddenIva').value = iva;
+            document.getElementById('hiddenTotal').value = total;
+        }
+
+        // Iniciar con una fila vacía
+        window.onload = agregarFila;
+    </script>
+</body>
+</html>

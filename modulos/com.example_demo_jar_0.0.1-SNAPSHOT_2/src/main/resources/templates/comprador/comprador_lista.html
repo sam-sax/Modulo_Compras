@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Compradores</title>
+    <style>
+        /* Regla personalizada: Flush with the top */
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background-color: #f2f2f2; 
+            margin: 0; 
+            padding: 0; /* Asegura que el contenido inicie arriba */
+        }
+        
+        /* Ajuste para que el contenido no quede oculto bajo el menú si es fijo */
+        .header-section { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background-color: #ffffff; 
+            padding: 15px 30px; 
+            border-bottom: 2px solid #e67e22; 
+            margin-top: 0; 
+        }
+
+        .header-section h1 { margin: 0; font-size: 22px; color: #e67e22; }
+        .btn-nuevo { 
+            padding: 8px 16px; background-color: #28a745; color: white; 
+            text-decoration: none; border-radius: 5px; font-weight: bold;
+        }
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; font-size: 12px; text-transform: uppercase; color: #555; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-activo { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header-section">
+        <h1><i class="fa fa-shopping-cart"></i> Listado de Compradores</h1>
+        <a th:href="@{/admin/comprador/nuevo}" class="btn-nuevo">+ Nuevo Comprador</a>
+    </div>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre Completo</th>
+                    <th>Código Comprador</th>
+                    <th>Usuario</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="c : ${compradores}">
+                    <td th:text="${c.id}"></td>
+                    <td th:text="${c.persona.nombres + ' ' + c.persona.apellidos}" style="font-weight: bold;"></td>
+                    <td th:text="${c.codigoComprador}"></td>
+                    <td>
+                        <code th:text="${c.usuario.usuario}"></code>
+                        <span th:unless="${c.usuario != null}" style="color: gray;">Sin Usuario</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-activo" th:text="${c.activo ? 'ACTIVO' : 'INACTIVO'}"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

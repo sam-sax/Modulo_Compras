@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Personas | Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+    <style>
+        /* REGLA: Totalmente pegado arriba (Flush) */
+        body, html { 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            background: #f4f7f9;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .container { 
+            background: white; 
+            padding: 25px; 
+            margin: 0 !important; /* Eliminado el auto y el margin-top para flush total */
+            border-radius: 0; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+            min-height: 100vh;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        h2 { color: #1a73e8; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        
+        /* Barra de Filtros */
+        .filtro-bar { 
+            display: flex; flex-wrap: wrap; gap: 12px; background: #f8f9fa; 
+            padding: 20px; border-radius: 8px; margin-bottom: 25px; 
+            align-items: center; border: 1px solid #dee2e6;
+        }
+        .filtro-bar input, .filtro-bar select { 
+            padding: 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 14px;
+        }
+        
+        /* Botones */
+        .btn { padding: 10px 18px; border-radius: 6px; text-decoration: none; border: none; cursor: pointer; color: white; font-weight: 500; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-search { background: #1a73e8; }
+        .btn-clear { background: #6c757d; }
+        .btn-add { background: #28a745; margin-right: 5px; }
+        .btn-home { background: #343a40; }
+        
+        /* Tabla con scroll */
+        .table-responsive { overflow-x: auto; margin-top: 10px; border-radius: 8px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; min-width: 1600px; font-size: 13px; background: white; }
+        th { background: #1a73e8; color: white; padding: 15px; text-align: left; position: sticky; top: 0; }
+        td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        tr:hover { background: #f8fbff; }
+        
+        /* Badges */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        .badge-user { background: #e3f2fd; color: #0d47a1; border: 1px solid #bbdefb; }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+    
+    <div class="container">
+        <h2><i class="fa fa-address-card"></i> Listado General de Personas</h2>
+
+        <div style="margin-bottom: 20px;">
+            <a th:href="@{/personas/form}" class="btn btn-add"><i class="fa fa-plus-circle"></i> Registrar Persona</a>
+            <a th:href="${linkPrincipal}" class="btn btn-home"><i class="fa fa-home"></i> Volver al Panel</a>
+        </div>
+
+        <div th:if="${success}" style="color: #155724; padding: 12px; background: #d4edda; border-radius: 6px; margin-bottom: 15px; border: 1px solid #c3e6cb;" th:text="${success}"></div>
+
+        <form th:action="@{/personas/listado}" method="get" class="filtro-bar">
+            <input type="text" name="q" th:value="${q}" placeholder="Buscar nombre, RUC o CI..." style="flex: 1; min-width: 250px;">
+            
+            <select name="rol">
+                <option value="">-- Todos los Roles --</option>
+                <option value="CLI" th:selected="${rol == 'CLI'}">Cliente</option>
+                <option value="PROV" th:selected="${rol == 'PROV'}">Proveedor</option>
+                <option value="VEND" th:selected="${rol == 'VEND'}">Vendedor</option>
+                <option value="COMP" th:selected="${rol == 'COMP'}">Comprador</option>
+                <option value="USER" th:selected="${rol == 'USER'}">Tienen Usuario</option>
+            </select>
+
+            <select name="ciudadId">
+                <option value="">-- Ciudad (Paraguay) --</option>
+                <option th:each="c : ${ciudades}" 
+                        th:value="${c.id}" 
+                        th:text="${c.nombre}" 
+                        th:selected="${c.id == ciudadId}">
+                </option>
+            </select>
+
+            <button type="submit" class="btn btn-search"><i class="fa fa-filter"></i> Filtrar</button>
+            <a th:href="@{/personas/listado}" class="btn btn-clear"><i class="fa fa-sync-alt"></i> Limpiar</a>
+        </form>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre / Razón Social</th>
+                        <th>Documento / RUC</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Ciudad</th>
+                        <th>Estado Civil</th>
+                        <th>F. Nacimiento</th>
+                        <th>F. Ingreso</th>
+                        <th>Roles</th>
+                        <th>Audit. Creador</th>
+                        <th>Usuario Vinc. (ID)</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${personas}">
+                        <td th:text="${p.idPersona}"></td>
+                        <td th:text="${p.nombreMostrable}" style="font-weight: 600; color: #1a1a1a;"></td>
+                        <td th:text="${p.documentoMostrable}"></td>
+                        <td th:text="${p.email != null ? p.email : '-'}"></td>
+                        <td th:text="${p.telefono != null ? p.telefono : '-'}"></td>
+                        <td th:text="${p.ciudad != null ? p.ciudad.nombre : '-'}"></td>
+                        <td th:text="${p.estadoCivil != null ? p.estadoCivil : '-'}"></td>
+                        <td th:text="${p.fechaNacimiento != null ? #temporals.format(p.fechaNacimiento, 'dd/MM/yyyy') : '-'}"></td>
+                        <td th:text="${#temporals.format(p.fechaIngreso, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td>
+                            <span th:if="${p.esCliente}" class="badge" style="background: #e6fffa; color: #234e52; border: 1px solid #b2f5ea;">CLI</span>
+                            <span th:if="${p.esProveedor}" class="badge" style="background: #fffaf0; color: #7b341e; border: 1px solid #feebc8;">PROV</span>
+                            <span th:if="${p.esVendedor}" class="badge" style="background: #ebf8ff; color: #2a4365; border: 1px solid #bee3f8;">VEND</span>
+                        </td>
+                        <td th:text="${p.usuarioModificacion != null ? p.usuarioModificacion : 'SISTEMA'}" style="color: #666; font-style: italic;"></td>
+                        
+                        <td>
+                            <span th:if="${p.usuarioVinculado != null}" class="badge badge-user">
+                                <i class="fa fa-id-badge"></i> 
+                                [[${p.usuarioVinculado.usuario}]] (ID: [[${p.usuarioVinculado.id}]])
+                            </span>
+                            <span th:if="${p.usuarioVinculado == null}" style="color: #ccc;">-</span>
+                        </td>
+                        
+                        <td>
+                            <a th:href="@{'/personas/editar/' + ${p.idPersona}}" style="color: #28a745; margin-right: 15px; font-size: 16px;" title="Editar">
+                                <i class="fa fa-pen-to-square"></i>
+                            </a>
+                            <form th:action="@{'/personas/eliminar/' + ${p.idPersona}}" method="post" style="display:inline;">
+                                <button type="submit"
+                                        style="color:#dc3545; font-size:16px; border:none; background:none; cursor:pointer;"
+                                        title="Eliminar"
+                                        onclick="return confirm('¿Está seguro de eliminar esta persona?')">
+                                    <i class="fa fa-trash-can"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

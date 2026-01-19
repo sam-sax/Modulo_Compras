@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Vendedor</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f6; margin: 0; }
+        .form-container { 
+            max-width: 500px; 
+            margin: 50px auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        h1 { color: #2c3e50; text-align: center; margin-top: 0; font-size: 24px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #4a5568; }
+        input, select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #cbd5e0; 
+            border-radius: 6px; 
+            box-sizing: border-box; /* Evita que el input se salga del contenedor */
+        }
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background-color: #1abc9c; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #16a085; }
+        .alert { padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
+        .alert-error { background-color: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+        .alert-success { background-color: #f0fff4; color: #2f855a; border: 1px solid #9ae6b4; }
+        .alert-warn { background-color: #fffaf0; color: #9c4221; border: 1px solid #feebc8; }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #718096; text-decoration: none; font-size: 14px; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="form-container">
+        <h1>Registrar Vendedor</h1>
+
+        <div th:if="${error}" class="alert alert-error">
+            <strong>❌ Error:</strong> <span th:text="${error}"></span>
+        </div>
+        <div th:if="${mensaje}" class="alert alert-success">
+            <strong>✅ Éxito:</strong> <span th:text="${mensaje}"></span>
+        </div>
+
+        <div th:if="${#lists.isEmpty(personas)}" class="alert alert-warn">
+            ⚠️ <strong>Atención:</strong> No hay personas disponibles para asignar como vendedor. 
+            <br><br>
+            <a th:href="@{/personas/form}" style="color: #9c4221; font-weight: bold;">Registra una persona aquí</a> 
+        </div>
+
+        <form th:if="${not #lists.isEmpty(personas)}" th:action="@{/admin/vendedor/guardar}" method="post">
+            <div class="form-group">
+                <label>Usuario:</label>
+                <input type="text" name="usuario" placeholder="Ej: vendedor_01" required/>
+            </div>
+
+            <div class="form-group">
+                <label>Clave:</label>
+                <input type="password" name="clave" placeholder="••••••••" required/>
+            </div>
+
+            <div class="form-group">
+                <label>Persona asociada:</label>
+                <select name="personaId" required>
+                    <option value="">-- Seleccionar persona --</option>
+                    <option th:each="p : ${personas}"
+                            th:value="${p.idPersona}"
+                            th:text="${p.idPersona + ' - ' + p.nombres + ' ' + p.apellidos}">
+                    </option>
+                </select>
+            </div>
+
+            <button type="submit">🚀 Registrar Vendedor</button>
+        </form>
+
+        <a th:href="@{/admin/principal}" class="back-link">← Volver al Panel de Administración</a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Presupuestos</title>
+    <style>
+        body, html { 
+            margin: 0; padding: 0; padding-top: 70px; 
+            font-family: 'Segoe UI', sans-serif; background: #f4f7f6; 
+        }
+        .header { background: #2980b9; color: white; padding: 20px; text-align: center; }
+        .container { padding: 25px; max-width: 1100px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #dee2e6; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .btn-new { background: #27ae60; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; float: right; }
+        .btn-action { background: #3498db; color: white; text-decoration: none; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; background: #ffeaa7; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header">
+        <h2 style="margin:0;">Gestión de Presupuestos</h2>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <a th:href="@{/compras/presupuestos/nuevo}" class="btn-new">+ Cargar Nuevo Presupuesto</a>
+            <div style="clear:both;"></div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Número</th>
+                        <th>Proveedor</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${presupuestos}">
+                        <td th:text="${p.fecha}"></td>
+                        <td th:text="${p.numero}"></td>
+                        <td th:text="${p.proveedor.razonSocial}"></td>
+                        <td th:text="${'$ ' + p.total}"></td>
+                        <td><span class="badge" th:text="${p.estado}"></span></td>
+                        <td>
+                            <a th:href="@{/compras/presupuestos/convertir/{id}(id=${p.id})}" class="btn-action">Convertir a Orden</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Notas de Crédito - Compras</title>
+    <style>
+        body, html { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; }
+        .header-list { background: #e67e22; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #d35400; }
+        .header-list h2 { margin: 0; }
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-new { background: #d35400; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; transition: 0.3s; }
+        .btn-new:hover { background: #ba4a00; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #34495e; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .monto { font-weight: bold; color: #c0392b; text-align: right; font-family: 'Consolas', monospace; }
+        .badge-aplicado { background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+    <div class="header-list">
+        <h2>Gestión de Notas de Crédito</h2>
+        <a th:href="@{/compras/notas-credito/nuevo}" class="btn-new">+ Nueva Devolución</a>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h3 style="margin-top:0; color: #2c3e50;">Historial de Documentos Aplicados</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="15%">Fecha</th><th width="40%">Proveedor</th><th width="15%" style="text-align:right">IVA</th><th width="15%" style="text-align:right">Monto Total</th><th width="15%" style="text-align:center">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="n : ${notasCredito}">
+                        <td th:text="${#temporals.format(n.fecha, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${n.proveedor.razonSocial}" style="font-weight: 500;"></td>
+                        <td class="monto" style="color: #7f8c8d;" th:text="${#numbers.formatDecimal(n.iva, 1, 'POINT', 0, 'COMMA')}"></td>
+                        <td class="monto" th:text="${#numbers.formatDecimal(n.montoTotal, 1, 'POINT', 0, 'COMMA')}"></td>
+                        <td style="text-align: center;"><span class="badge-aplicado">APLICADO</span></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(notasCredito)}">
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #95a5a6;">No se registran notas de crédito.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

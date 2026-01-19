@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cuentas a Pagar</title>
+    <style>
+        /* Requisito: Flush with the top */
+        body, html { margin: 0; padding: 0; padding-top: 70px; font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; }
+        .header-section { background: #8e44ad; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #732d91; }
+        .header-section h2 { margin: 0; }
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .toolbar { margin-bottom: 20px; display: flex; gap: 10px; }
+        
+        .btn-filter { background: white; border: 1px solid #8e44ad; color: #8e44ad; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .btn-filter.active { background: #8e44ad; color: white; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        th { background: #34495e; color: white; padding: 15px; text-align: left; font-size: 0.9rem; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        
+        .status-badge { padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; display: inline-block; }
+        .PENDIENTE { background: #ffeaa7; color: #d35400; }
+        .VENCIDO { background: #fab1a0; color: #c0392b; }
+        .PAGADO { background: #55efc4; color: #00b894; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragmentos/menu :: menu}"></div>
+
+    <div class="header-section">
+        <h2 th:text="${titulo}">Gestión de Cuentas a Pagar</h2>
+        <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy HH:mm')}"></span>
+    </div>
+
+    <div class="container">
+        <div class="toolbar">
+            <a th:href="@{/compras/cuentas/vista}" class="btn-filter" 
+               th:classappend="${param.vencidas == null ? 'active' : ''}">Todas las Cuentas</a>
+            <a th:href="@{/compras/cuentas/vista(vencidas=true)}" class="btn-filter" 
+               th:classappend="${param.vencidas != null ? 'active' : ''}">Solo Vencidas ⚠️</a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Proveedor</th>
+                    <th>Vencimiento</th>
+                    <th>Subtotal</th>
+                    <th>IVA</th>
+                    <th>Total Gs.</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="c : ${cuentas}">
+                    <td th:text="${c.proveedor.razonSocial}" style="font-weight: 500;"></td>
+                    <td th:text="${#temporals.format(c.fechaVencimiento, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.subtotal, 1, 'POINT', 0, 'COMMA')}"></td>
+                    <td th:text="${#numbers.formatDecimal(c.iva, 1, 'POINT', 0, 'COMMA')}"></td>
+                    <td style="font-weight: bold; color: #2c3e50;" th:text="${#numbers.formatDecimal(c.total, 1, 'POINT', 0, 'COMMA')}"></td>
+                    <td>
+                        <span th:class="'status-badge ' + ${c.estado}" th:text="${c.estado}"></span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(cuentas)}">
+                    <td colspan="6" style="text-align: center; padding: 30px; color: #95a5a6;">No se encontraron cuentas con el filtro seleccionado.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
